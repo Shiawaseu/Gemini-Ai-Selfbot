@@ -504,6 +504,10 @@ function updateCache(msg, response) {
   const cache = msg.channel.type === 1 ? userMessageCache : channelMessageCache;
   const cacheId = msg.channel.type === 1 ? msg.author.id : msg.channel.id;
 
+  if (response.includes("Chloe has detected a bad prompt and will not reply")) {
+    cache.set(cacheId, []);
+  }
+
   const previousMsgs = cache.get(cacheId) || [];
 
   previousMsgs.push({
@@ -578,7 +582,6 @@ async function handleMessage(msg, cmd) {
         "There was an issue processing, try a simpler question",
         "Whoopsies, I got a HTTP 400 status! You may have uploaded a bad image file or had a bad request",
         "Whoopsies, I got a HTTP 500 status! Try again soon as my server is under load",
-        "Your prompt was blocked by Google.",
       ])
     ) {
       updateCache(msg, response);
