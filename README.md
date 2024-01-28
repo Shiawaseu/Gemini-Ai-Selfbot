@@ -14,3 +14,9 @@ Commands are as follows:
 ;airr <User> => Removes a user from the auto reply list
 
 ;aira <User> => Re-adds a user to the auto reply list
+
+Features are as follows:
+
+Can read uploaded text based files / images (Png,Jpeg,Gif Only) => Switches to vision for this
+
+Can send files if the reply is too long, doesn't auto detect nitro so by default its at 4000 chars, you may need to change this
