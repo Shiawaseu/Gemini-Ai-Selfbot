@@ -5,6 +5,7 @@ You will need a google api key for gemini
 
 Default prefix is ";"
 
+
 Commands are as follows:
 
 ;ai <Prompt> => Returns the AIs reply
@@ -14,6 +15,7 @@ Commands are as follows:
 ;airr <User> => Removes a user from the auto reply list
 
 ;aira <User> => Re-adds a user to the auto reply list
+
 
 Features are as follows:
 
