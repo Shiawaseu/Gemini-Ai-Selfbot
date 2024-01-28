@@ -12,7 +12,7 @@ import settings from "./settings.json" assert { type: "json" };
 const eventsDir = readdirSync("events");
 const prefix = settings.prefix;
 
-const gemini = new Gemini("YourApiKey", {
+const gemini = new Gemini(settings.apiKey, {
   fetch: fetch,
 });
 
@@ -168,7 +168,11 @@ async function askGemini(prompt, dataGiven) {
             format: Gemini.JSON,
           })
           .then(async (response) => {
-            if (response.length > 4000) {
+            if (
+              client.user.premiumType === 2
+                ? response.length > 4000
+                : response.length > 2000
+            ) {
               if (response.candidates[0].content === undefined) {
                 resolve(
                   "There was an issue processing, try a simpler question"
@@ -220,7 +224,11 @@ async function askGemini(prompt, dataGiven) {
             format: Gemini.JSON,
           })
           .then(async (response) => {
-            if (response.length > 4000) {
+            if (
+              client.user.premiumType === 2
+                ? response.length > 4000
+                : response.length > 2000
+            ) {
               if (response.candidates[0].content === undefined) {
                 resolve(
                   "There was an issue processing, try a simpler question"
@@ -262,7 +270,6 @@ async function askGemini(prompt, dataGiven) {
 }
 
 let DmAiBusy = false;
-let ChannelAiBusy = false;
 
 const userMessageCache = new Map();
 const channelMessageCache = new Map();
@@ -414,10 +421,15 @@ client.on("messageCreate", async (msg) => {
   }
 });
 
-async function shouldRespondToMessage(msg, cmd, channel) {
+async function shouldRespondToMessage(msg, cmd) {
   if (cmd) return true;
 
   const isDM = msg.channel.type === "DM";
+
+  const object = JSON.parse(readFileSync("removed.json", { encoding: "utf8" }));
+  const tags = Object.keys(object);
+
+  if (tags.includes(msg.author.id)) return;
 
   return (
     isDM &&
@@ -461,13 +473,19 @@ function constructPrompt(msg, previousMsgs, fileContent) {
 
 async function sendResponse(msg, response, sentMsg) {
   let hasFile = false;
-  if (response.length > 4000) hasFile = true;
+  if (
+    client.user.premiumType === 2
+      ? response.length > 4000
+      : response.length > 2000
+  )
+    hasFile = true;
 
   if (hasFile) {
     await sentMsg.edit({
       files: [{ attachment: Buffer.from(response), name: "my_response.txt" }],
-      content:
-        "Whoopsies! The character count exceeded 4000, so here's a file with my response instead!",
+      content: `Whoopsies! The character count exceeded ${
+        client.user.premiumType === 2 ? "4000" : "2000"
+      }, so here's a file with my response instead!`,
     });
   } else {
     await sentMsg.edit(response);
@@ -502,19 +520,16 @@ async function handleMessage(msg, cmd) {
   let sentMsg;
   let previousMsgs;
   let response;
-  let isDm;
   let fileContentResult;
 
   if (await shouldRespondToMessage(msg, cmd)) {
-    isDm = msg.channel.type === 1;
-
-    if (isDm) {
-      if (DmCooldown.has(msg.author.id)) {
-        return;
-      }
+    if (DmCooldown.has(msg.author.id) && !cmd) {
+      return;
     }
 
-    DmCooldown.set(msg.author.id, { processing: true });
+    if (!cmd) {
+      DmCooldown.set(msg.author.id, { processing: true });
+    }
 
     sentMsg = await sendAndUpdateMessage(msg, "Chloe Is Currently Thinking...");
     previousMsgs = getCachedMessages(msg);
@@ -526,11 +541,12 @@ async function handleMessage(msg, cmd) {
         console.log(fileContentResult.error);
         sentMsg.edit(`Error reading file: ${fileContentResult.error}`);
 
-        if (isDm) {
+        if (!cmd) {
           setTimeout(() => {
             DmCooldown.delete(msg.author.id);
           }, 500);
         }
+
         return;
       }
 
@@ -559,7 +575,7 @@ async function handleMessage(msg, cmd) {
       updateCache(msg, response);
     }
 
-    if (isDm) {
+    if (!cmd) {
       setTimeout(() => {
         DmCooldown.delete(msg.author.id);
       }, 500);
