@@ -21,4 +21,4 @@ Features are as follows:
 
 Can read uploaded text based files / images (Png,Jpeg,Gif Only) => Switches to vision for this
 
-Can send files if the reply is too long, doesn't auto detect nitro so by default its at 4000 chars, you may need to change this
+Can send files if the reply is too long, auto detects nitro so it will know when to send files at which character count
