@@ -210,6 +210,10 @@ async function askGemini(prompt, dataGiven) {
               resolve(
                 "Hmmm, this appears to be an unknown file type, use pngs, jpegs or jpgs!"
               );
+            } else if (
+              err.toString().includes("Your prompt was blocked by Google.")
+            ) {
+              resolve("Chloe has detected a bad prompt and will not reply");
             } else {
               resolve(
                 "Whoopsies, I got a HTTP 500 status! Try again soon as my server is under load"
@@ -255,6 +259,10 @@ async function askGemini(prompt, dataGiven) {
               resolve(
                 "Whoopsies, I got a HTTP 400 status! You may have uploaded a bad image file or had a bad request"
               );
+            } else if (
+              err.toString().includes("Your prompt was blocked by Google.")
+            ) {
+              resolve("Chloe has detected a bad prompt and will not reply");
             } else {
               resolve(
                 "Whoopsies, I got a HTTP 500 status! Try again soon as my server is under load"
@@ -570,6 +578,7 @@ async function handleMessage(msg, cmd) {
         "There was an issue processing, try a simpler question",
         "Whoopsies, I got a HTTP 400 status! You may have uploaded a bad image file or had a bad request",
         "Whoopsies, I got a HTTP 500 status! Try again soon as my server is under load",
+        "Your prompt was blocked by Google.",
       ])
     ) {
       updateCache(msg, response);
