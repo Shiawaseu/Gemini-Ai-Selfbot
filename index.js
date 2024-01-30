@@ -1,4 +1,5 @@
 import { Client } from "discord.js-selfbot-v13";
+
 const client = new Client({
   checkUpdate: false,
   allowedMentions: { parse: ["users", "roles"], repliedUser: false },
@@ -67,6 +68,17 @@ async function handleFileUpload(fileUrl, fileName) {
   }
 }
 
+const allowedExtensions = new Set([
+  "txt", "js", "json", "md", "html", "css", "xml", "csv", "log", "py", "rb",
+  "java", "sh", "bat", "ps1", "cpp", "hpp", "h", "cs", "go", "sql", "toml",
+  "yaml", "ini", "config", "props", "properties", "dockerfile", "eslintrc",
+  "babelrc", "package", "lock", "json5", "vue", "jsx", "ts", "tsx", "graphql",
+  "mdx", "rest", "raml", "wsdl", "wadl", "proto", "thrift", "openapi", "rego",
+  "tf", "tfvars", "hcl", "nomad", "nomadfile", "sh", "zsh", "bash", "awk",
+  "sed", "awk", "vim", "gitconfig", "gitignore", "makefile", "dockerfile",
+  "jenkinsfile", "readme", "contributing"
+]);
+
 function isTextFile(file) {
   const mimeType = file.mimetype;
 
@@ -74,76 +86,7 @@ function isTextFile(file) {
     return true;
   }
 
-  const allowedExtensions = [
-    "txt",
-    "js",
-    "json",
-    "md",
-    "html",
-    "css",
-    "xml",
-    "csv",
-    "log",
-    "py",
-    "rb",
-    "java",
-    "sh",
-    "bat",
-    "ps1",
-    "cpp",
-    "hpp",
-    "h",
-    "cs",
-    "go",
-    "sql",
-    "toml",
-    "yaml",
-    "ini",
-    "config",
-    "props",
-    "properties",
-    "dockerfile",
-    "eslintrc",
-    "babelrc",
-    "package",
-    "lock",
-    "json5",
-    "vue",
-    "jsx",
-    "ts",
-    "tsx",
-    "graphql",
-    "mdx",
-    "rest",
-    "raml",
-    "wsdl",
-    "wadl",
-    "proto",
-    "thrift",
-    "openapi",
-    "rego",
-    "tf",
-    "tfvars",
-    "hcl",
-    "nomad",
-    "nomadfile",
-    "sh",
-    "zsh",
-    "bash",
-    "awk",
-    "sed",
-    "awk",
-    "vim",
-    "gitconfig",
-    "gitignore",
-    "Makefile",
-    "Dockerfile",
-    "Jenkinsfile",
-    "README",
-    "CONTRIBUTING",
-  ];
-
-  return allowedExtensions.includes(file.extension.toLowerCase());
+  return allowedExtensions.has(file.extension.toLowerCase());
 }
 
 async function sendAndUpdateMessage(msg, content) {
