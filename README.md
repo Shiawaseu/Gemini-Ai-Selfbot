@@ -2,6 +2,8 @@
 A gemini-pro powered selfbot, that can reply to commands or auto respond to dms for you
 
 You will need a google api key for gemini
+  - You can get your API Key [Here](https://makersuite.google.com/app/apikey)
+
 
 Default prefix is ";"
 
